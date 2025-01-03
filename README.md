@@ -30,8 +30,7 @@ A real-time vehicle monitoring dashboard system built with React frontend and No
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd vehicle-dashboard
+   git clone https://github.com/WuxiGuy/eae-full-stack-challenge-yuhao-glenn-hua.git
    ```
 
 2. Set up environment variables:
