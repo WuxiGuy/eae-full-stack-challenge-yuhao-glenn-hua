@@ -1,17 +1,28 @@
 # Dependencies
-node_modules/
+/node_modules
+/frontend/node_modules
+/backend/node_modules
 /.pnp
 .pnp.js
 
+# Package lock files
+package-lock.json
+yarn.lock
+/frontend/package-lock.json
+/backend/package-lock.json
+
 # Testing
 /coverage
+/frontend/coverage
+/backend/coverage
 
-# Production
+# Production builds
+/build
+/dist
 /frontend/build
 /backend/build
-/backend/lib
 /backend/dist
-*.zip
+/backend/lib
 
 # Environment files
 .env
@@ -19,42 +30,54 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+/frontend/.env
+/backend/.env
 
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+/frontend/npm-debug.log*
+/backend/npm-debug.log*
+logs
+*.log
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# OS generated files
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+/frontend/*.tsbuildinfo
+/backend/*.tsbuildinfo
+
+# Temporary files
+.temp
+.tmp
+.cache
+/frontend/.cache
+/backend/.cache
+
+# AWS & Deployment
+.aws/
+.serverless/
+*.zip
+/infrastructure/build
+/infrastructure/dist
 
 # Misc
-.DS_Store
-Thumbs.db
 .cache/
 dist/
 tmp/
-temp/
-
-# AWS
-.aws/
-.serverless/ 
+temp/ 

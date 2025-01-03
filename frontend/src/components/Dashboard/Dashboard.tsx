@@ -74,29 +74,46 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Add a state to track initial load
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
   // Fetch vehicle state periodically
   useEffect(() => {
     const fetchState = async () => {
       try {
         console.log('Fetching state from:', `${API_URL}/state`);
+        // Only show loading on initial load
+        if (isInitialLoad) {
+          setIsLoading(true);
+        }
+        
         const response = await fetch(`${API_URL}/state`);
-        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers));
+        
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Server error response:', errorText);
-          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        console.log('Received data:', data);
-        if (data.state) {
-          setVehicleState(data.state);
+        
+        const text = await response.text();
+        console.log('Raw response:', text);
+        
+        try {
+          const data = JSON.parse(text);
+          setVehicleState(data);
           setError(null);
+        } catch (parseError) {
+          console.error('Failed to parse JSON:', parseError);
+          console.log('Received non-JSON response:', text);
+          setError('Failed to parse server response');
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error fetching vehicle state:', error);
-        setError(`Failed to connect to vehicle system: ${error.message}`);
+        setError(`Failed to connect to vehicle system: ${error}`);
       } finally {
-        setIsLoading(false);
+        if (isInitialLoad) {
+          setIsLoading(false);
+          setIsInitialLoad(false);
+        }
       }
     };
 
@@ -105,7 +122,7 @@ const Dashboard: React.FC = () => {
     const interval = setInterval(fetchState, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, []); // isInitialLoad doesn't need to be in dependencies as it only matters for first load
 
   const handleApiError = (error: any, action: string) => {
     console.error(`Error ${action}:`, error);
@@ -215,7 +232,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard">
-      {isLoading && (
+      {/* Only show loading when both isLoading AND isInitialLoad are true */}
+      {isLoading && isInitialLoad && (
         <div className="dashboard-overlay">
           <div className="loading-spinner">Loading...</div>
         </div>

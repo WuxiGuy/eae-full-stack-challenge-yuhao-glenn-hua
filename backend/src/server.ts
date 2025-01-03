@@ -11,21 +11,16 @@ const app = express();
 const simulator = new VehicleSimulator('vehicle-1'); // Single vehicle instance
 
 // Connect to MongoDB
-connectDB();
+connectDB().catch(err => {
+  console.warn('Warning: Running without MongoDB connection:', err.message);
+});
 
 // Enable CORS and JSON parsing
 app.use(express.json());
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:3000',  // Frontend URL
-    'http://localhost:3000'  // Local development
-  ];
-  const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
   next();
 });
 
@@ -66,17 +61,13 @@ app.get('/state', async (req: Request, res: Response) => {
     console.log('Fetching vehicle state');
     const state = simulator.getState();
     console.log('Vehicle state:', state);
-    res.json({
-      status: 'ok',
-      state,
-      timestamp: new Date().toISOString()
-    });
+    // Send just the state object to match frontend expectations
+    res.json(state);
   } catch (error: any) {
     console.error('Error in /state endpoint:', error);
     res.status(500).json({
       status: 'error',
-      message: error.message || 'Error fetching vehicle state',
-      details: error.stack
+      message: error.message || 'Error fetching vehicle state'
     });
   }
 });
@@ -96,6 +87,12 @@ app.get('/', (req: Request, res: Response) => {
       '/control/temperature': 'Show temperature details (POST)'
     }
   });
+});
+
+// Add this line to listen on the port
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 // Export the app and simulator for Lambda
