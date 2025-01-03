@@ -58,9 +58,9 @@ app.post('/control/temperature', (req: Request, res: Response) => {
 // Get current vehicle state
 app.get('/state', async (req: Request, res: Response) => {
   try {
-    console.log('Fetching vehicle state');
+    // console.log('Fetching vehicle state');
     const state = simulator.getState();
-    console.log('Vehicle state:', state);
+    // console.log('Vehicle state:', state);
     // Send just the state object to match frontend expectations
     res.json(state);
   } catch (error: any) {
