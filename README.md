@@ -61,6 +61,10 @@ A real-time vehicle monitoring dashboard system built with React frontend and No
    - Frontend: http://localhost:3000
    - Backend: http://localhost:3001
 
+6. Access the database
+   - Download MongoDB Compass
+   - Add new connection with provided url
+
 ## Deployment
 
 ### Frontend Deployment (AWS S3)
