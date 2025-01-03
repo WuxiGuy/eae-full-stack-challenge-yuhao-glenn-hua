@@ -1,0 +1,124 @@
+/**
+ * Controls Component Styles
+ * 
+ * Defines the layout and appearance of vehicle control elements including
+ * the motor speed slider and charging toggle button.
+ * Uses a dark theme consistent with the dashboard design.
+ */
+
+/* Main controls container */
+.controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #2a2a2a;
+  border-radius: 4px;
+}
+
+/* Speed control section */
+.speed-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Speed setting label */
+.speed-label {
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-family: Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+/* Speed slider styling */
+.speed-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #3a3a3a;
+  border-radius: 2px;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+/* Slider hover effect */
+.speed-slider:hover {
+  opacity: 1;
+}
+
+/* Slider thumb (handle) styling */
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #4CAF50;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.speed-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #4CAF50;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Slider thumb hover effect */
+.speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.speed-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+/* Speed labels container */
+.speed-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  margin-top: 0.5rem;
+}
+
+/* Individual speed label */
+.speed-labels span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* Disabled state styles */
+.speed-slider:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.speed-slider:disabled::-webkit-slider-thumb {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.speed-slider:disabled::-moz-range-thumb {
+  background: #666;
+  cursor: not-allowed;
+}
+
+/* Speed disabled message */
+.speed-disabled-message {
+  color: #ff3b30;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-family: Arial, sans-serif;
+} 

@@ -1,0 +1,38 @@
+.status-indicators {
+  display: flex;
+  gap: 20px;
+}
+
+.indicator {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background-color: #ff3b30;
+  box-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
+}
+
+.indicator-icon {
+  font-size: 24px;
+  color: #666;
+}
+
+.indicator.active .indicator-icon {
+  color: white;
+}
+
+/* Specific indicator styles */
+.parking-brake {
+  font-weight: bold;
+}
+
+.check-engine, .motor-warning, .battery-low {
+  font-size: 20px;
+} 

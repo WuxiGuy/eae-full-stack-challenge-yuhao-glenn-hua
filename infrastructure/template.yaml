@@ -1,0 +1,202 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Vehicle Dashboard Infrastructure
+
+Resources:
+  # S3 bucket for frontend
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub vehicle-dashboard-frontend-${AWS::AccountId}
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  # S3 bucket policy
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub '${FrontendBucket.Arn}/*'
+
+  # DynamoDB table for vehicle state
+  VehicleStateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: vehicle-state
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: connectionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: connectionId
+          KeyType: HASH
+
+  # Lambda function
+  VehicleDashboardFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: vehicle-dashboard-backend-yuhao
+      Runtime: nodejs18.x
+      Handler: index.handler
+      Code:
+        S3Bucket: !Ref FrontendBucket
+        S3Key: function.zip
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          MONGODB_URI: '{{resolve:secretsmanager:MONGODB_URI}}'
+
+  # Lambda execution role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                Resource: !GetAtt VehicleStateTable.Arn
+
+  # HTTP API
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: VehicleDashboardAPI
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        MaxAge: 300
+
+  # HTTP API Stage
+  HttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: prod
+      AutoDeploy: true
+
+  # HTTP API Integration
+  HttpApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationMethod: POST
+      PayloadFormatVersion: '2.0'
+      IntegrationUri: !GetAtt VehicleDashboardFunction.Arn
+      Description: Lambda integration
+
+  # HTTP API Routes
+  StateRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'GET /state'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegration
+
+  MotorSpeedRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /control/motorSpeed'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegration
+
+  ChargingRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /control/charging'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegration
+
+  EngineRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /control/engine'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegration
+
+  BrakeHoldRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /control/brakeHold'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegration
+
+  TemperatureRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: 'POST /control/temperature'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegration
+
+  # Lambda permission for HTTP API
+  HttpApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref VehicleDashboardFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*
+
+Outputs:
+  ApiEndpoint:
+    Description: "HTTP API Endpoint"
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${HttpApiStage}/
+  FrontendURL:
+    Description: "Frontend URL"
+    Value: !Sub http://${FrontendBucket}.s3-website-${AWS::Region}.amazonaws.com/

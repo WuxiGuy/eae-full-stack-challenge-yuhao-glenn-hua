@@ -1,0 +1,59 @@
+/**
+ * Gauge Component Styles
+ * 
+ * Defines the appearance of gauge components including the base gauge,
+ * power gauge, and RPM gauge. Uses D3.js for rendering circular gauges
+ * with a dark theme and accent colors for values and indicators.
+ */
+
+/* Main gauge container */
+.gauge {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Gauge background styling */
+.gauge-background {
+  fill: #2a2a2a;
+  stroke: #3a3a3a;
+  stroke-width: 1px;
+}
+
+/* Gauge value arc styling */
+.gauge-value {
+  fill: #4CAF50;
+  transition: d 0.3s ease;
+}
+
+/* Gauge tick marks */
+.tick {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 2;
+}
+
+/* Gauge tick labels */
+.tick-label {
+  fill: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+}
+
+/* Gauge value text */
+.value-text {
+  fill: white;
+  font-size: 24px;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+}
+
+/* Gauge unit text */
+.unit-text {
+  fill: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+} 
