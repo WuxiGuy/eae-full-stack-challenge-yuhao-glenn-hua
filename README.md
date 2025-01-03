@@ -35,7 +35,9 @@ A real-time vehicle monitoring dashboard system built with React frontend and No
 
 2. Set up environment variables:
    - Copy `.env.example` to `.env` in both frontend and backend directories
-   - Update the environment variables with your values
+   - Update the backend environment variables with your MongoDB connection string
+   - No need to update other environment variables if you are running locally
+   - update environment variables with your AWS credentials if you are deploying to AWS
 
 3. Install dependencies:
    ```bash
